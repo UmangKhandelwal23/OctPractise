@@ -1,0 +1,43 @@
+pipeline {
+    agent none
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('docker')
+    }
+
+    stages {
+
+        stage('git') {
+            agent { label 'Built-In Node' }
+            steps {
+                git branch: 'main', url: 'https://github.com/UmangKhandelwal23/OctPractise'
+            }
+        }
+
+        stage('docker build') {
+            agent { label 'Built-In Node' }
+            steps {
+                sh 'sudo docker build -t umangkhandelwal/OctPractise:v1 .'
+            }
+        }
+
+        stage('Docker Push') {
+            agent { label 'Built-In Node' }
+            steps {
+                sh '''
+                echo "$DOCKERHUB_CREDENTIALS_PSW" | docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin
+                docker push umangkhandelwal/OctPractise:v1
+                '''
+            }
+        }
+        stage('docker build') {
+            agent { label 'Slave' }
+            steps {
+                sh 'sudo docker compose up -d --build'
+            }
+        }
+
+
+       
+    }
+}

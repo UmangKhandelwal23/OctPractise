@@ -1,0 +1,7 @@
+services:
+  blog:
+   image: umangkhandelwal/OctPractise:v1
+   container_name: mycontainer
+   ports:
+    - "80:80"
+   restart: unless-stopped
